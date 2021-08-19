@@ -17,7 +17,7 @@ const packages = [
   'jest@27.0.6',
   'babel-jest@27.0.6',
   '@testing-library/react@12.0.0',
-  '@testing-library@5.14.1',
+  '@testing-library/jest-dom@5.14.1',
   'identity-obj-proxy@3.0.0',
   'react-test-renderer@17.0.2',
   'cypress@8.3.0',
@@ -52,10 +52,12 @@ const runCmd = (options: {
   })
 
   cp.stderr?.on('data', (data) => {
-    console.log(`stderr: ${data}`)
+    if (!data.includes('warning')) {
+      console.log(`stderr: ${data}`)
+    }
   })
 
-  cp.on('close', (code)=> {
+  cp.on('close', ()=> {
     // console.error('error: ', code)
   })
 
@@ -82,7 +84,7 @@ inquirer.prompt<{ projectName: string }>([
     params: ['create', 'next-app', projectName, '--typescript'],
     onExit: () => {
       spinner.succeed()
-      spinner = ora('Customizing the application: Installing custom npm packages...')
+      spinner = ora('Customizing the application: Installing custom npm packages...').start()
       // once the nextjs has finished to install the packages, we need to install our custom packages
       runCmd({
         command: 'yarn',
