@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsc && node ./dist/create-next-app-nexus.js"
+    "build": "tsc && node ./dist/create-next-app-nexus.js"
   },
   "dependencies": {
     "@types/inquirer": "^7.3.3",
