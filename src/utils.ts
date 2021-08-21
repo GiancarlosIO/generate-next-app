@@ -1,4 +1,9 @@
 import { spawn } from 'child_process'
+import path from 'path'
+import {  promises } from 'fs'
+
+const { readFile, writeFile } = promises
+
 import ora from 'ora'
 
 export const cwd = process.cwd()
@@ -45,3 +50,9 @@ export const runCmd =  (options: {
     // console.error('error: ', code)
   })
 })
+
+export const readAndWriteTemplateFile = async (template: string, projectPathTowrite: string = '') => {
+  const customConfig = await readFile(path.join(__dirname, './templates', template), { encoding: 'utf-8' })
+  await writeFile(path.join(cwd, projectPathTowrite, template), customConfig)
+  return true
+}
