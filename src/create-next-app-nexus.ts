@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import path from 'path'
-// import { readFile } from 'fs/promises'
 
 import inquirer from 'inquirer'
+import ora from 'ora'
 
-import { runCmd, cwd } from './utils'
+import { runCmd, cwd, readAndWriteTemplateFile } from './utils'
 
 const packages = [
   'graphql@15.5.1',
@@ -46,7 +46,7 @@ inquirer.prompt<{ projectName: string }>([
   // once the nextjs has finished to install the packages, we need to install our custom packages
   const projectPath = path.join(cwd, projectName);
   await runCmd({
-    labelLoader: 'Customizing the application: Installing custom npm packages...',
+    labelLoader: 'Installing custom npm packages...',
     command: 'yarn',
     params: ['add', ...packages],
     // install packages inside the folder that the create-next-app has just created
@@ -56,11 +56,13 @@ inquirer.prompt<{ projectName: string }>([
   // here we need to create the configurations files
   // 1. Configure tailwindcss
   await runCmd({
-    labelLoader: 'Customizing the application: Initializing tailwindcss...',
+    labelLoader: 'Initializing tailwindcss...',
     command: 'npx',
     params: ['tailwindcss', 'init', '-p'],
     cwd: projectPath,
   })
-  // const tailwindConfig = await readFile(path.join(__dirname, ''))
+  let spinner = ora('Customizing tailwindcss configuration...').start()
+  await readAndWriteTemplateFile('tailwind.config.js')
+  spinner.succeed()
 })
 
