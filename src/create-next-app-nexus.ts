@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import path from 'path'
-import { spawn } from 'child_process'
-import ora from 'ora'
+// import { readFile } from 'fs/promises'
 
 import inquirer from 'inquirer'
+
+import { runCmd, cwd } from './utils'
 
 const packages = [
   'graphql@15.5.1',
@@ -23,47 +24,6 @@ const packages = [
   'cypress@8.3.0',
 ]
 
-
-
-const cwd = process.cwd()
-const runCmd = (options: {
-  command: string,
-  params: string[],
-  cwd?: string,
-  onData?: (data: any) => void,
-  onExit?: (code: number | null) => void,
-  // TODO: add the err handlers!!
-}) => {
-  const cp = spawn(options.command, options.params, {
-    cwd: options.cwd || cwd,
-    // stdio: 'inherit',
-  })
-
-  cp.stdout?.on('data', (data) => {
-    if (options.onData) {
-      options.onData(data)
-    }
-  })
-
-  cp.on('exit', (code) => {
-    if (options.onExit) {
-      options.onExit(code)
-    }
-  })
-
-  cp.stderr?.on('data', (data) => {
-    if (!data.includes('warning')) {
-      console.log(`stderr: ${data}`)
-    }
-  })
-
-  cp.on('close', ()=> {
-    // console.error('error: ', code)
-  })
-
-  return cp
-}
-
 inquirer.prompt<{ projectName: string }>([
   {
     type: 'input',
@@ -76,27 +36,31 @@ inquirer.prompt<{ projectName: string }>([
       return true
     }
   }
-]).then(({ projectName }) => {
-  let spinner = ora('Creating the base nextjs app...').start()
-
-  runCmd({
+]).then(async ({ projectName }) => {
+  await runCmd({
+    labelLoader: 'Creating the base nextjs app...',
     command: 'yarn',
     params: ['create', 'next-app', projectName, '--typescript'],
-    onExit: () => {
-      spinner.succeed()
-      spinner = ora('Customizing the application: Installing custom npm packages...').start()
-      // once the nextjs has finished to install the packages, we need to install our custom packages
-      runCmd({
-        command: 'yarn',
-        params: ['add', ...packages],
-        // install packages inside the folder that the create-next-app has just created
-        cwd: path.join(cwd, projectName),
-        onExit: () => {
-          spinner.succeed()
-          // here we need to create the configurations files
-        }
-      })
-    }
   })
+
+  // once the nextjs has finished to install the packages, we need to install our custom packages
+  const projectPath = path.join(cwd, projectName);
+  await runCmd({
+    labelLoader: 'Customizing the application: Installing custom npm packages...',
+    command: 'yarn',
+    params: ['add', ...packages],
+    // install packages inside the folder that the create-next-app has just created
+    cwd: projectPath,
+  })
+
+  // here we need to create the configurations files
+  // 1. Configure tailwindcss
+  await runCmd({
+    labelLoader: 'Customizing the application: Initializing tailwindcss...',
+    command: 'npx',
+    params: ['tailwindcss', 'init', '-p'],
+    cwd: projectPath,
+  })
+  // const tailwindConfig = await readFile(path.join(__dirname, ''))
 })
 
