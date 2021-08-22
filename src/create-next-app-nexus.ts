@@ -7,6 +7,7 @@ import ora from 'ora'
 
 import { runCmd, readAndWriteTemplateFile } from './utils'
 import { cwd } from './constants'
+import { EslintConfig } from './types'
 
 const { readFile, writeFile } = promises
 
@@ -28,6 +29,10 @@ const packages = [
   'cypress@8.3.0',
   // webpack and typescript
   'tsconfig-paths-webpack-plugin@3.5.1',
+  // eslint & prettier
+  'prettier@2.3.2',
+  'eslint-config-prettier@8.3.0',
+  'eslint-plugin-prettier@3.4.1'
 ]
 
 inquirer.prompt<{ projectName: string }>([
@@ -97,8 +102,31 @@ inquirer.prompt<{ projectName: string }>([
   const tsConfigContent = await readFile(path.join(cwd, projectName, './tsconfig.json'), { encoding: 'utf-8' })
   const tsConfig = JSON.parse(tsConfigContent) as {[key: string]: string}
   tsConfig.extends = './tsconfig.paths.json'
-  
   await writeFile(path.join(cwd, projectName, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2))
+  spinner.succeed()
+  
+  spinner = ora('Configuring eslint and prettier...').start()
+  const eslintConfigContent = await readFile(path.join(cwd, projectName, '.eslintrc.json'), { encoding: 'utf-8' })
+  const eslintConfig = JSON.parse(eslintConfigContent) as EslintConfig
+  eslintConfig.extends = typeof eslintConfig.extends === 'string' ?
+    [eslintConfig.extends, 'prettier'] :
+    [...eslintConfig.extends, 'prettier'];
+  eslintConfig.plugins = [...(eslintConfig.plugins || []), 'prettier']
+  eslintConfig.rules = {
+    ...(eslintConfig.rules || {}),
+    "prettier/prettier": [
+      "error",
+      {
+        "singleQuote": true,
+        "printWidth": 80,
+        "jsxBracketSameLine": false,
+        "trailingComma": "all",
+        "arrowParens": "avoid",
+        "endOfLine": "lf"
+      }
+    ]
+  }
+  await writeFile(path.join(cwd, projectName, '.eslintrc.json'), JSON.stringify(eslintConfig, null, 2))
   spinner.succeed()
 })
 
