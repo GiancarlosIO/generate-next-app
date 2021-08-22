@@ -20,11 +20,11 @@ export const runCmd =  (options: {
   // onExit?: (code: number | null) => void,
   // TODO: add the err handlers!!
 }) => new Promise((resolve, reject) => {
-  const spinner = ora(options.labelLoader).start()
-
   if (isDebug) {
     logDebug('\n> Debug: running command: ', options.command, options.params.join(' '))
   }
+
+  const spinner = ora(options.labelLoader).start()
   const cp = spawn(options.command, options.params, {
     cwd: options.cwd || cwd,
     // stdio: 'inherit',
