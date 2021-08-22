@@ -1,7 +1,15 @@
 import { spawn } from 'child_process'
+import path from 'path'
+import {  promises } from 'fs'
+import chalk from 'chalk'
+
+const { readFile, writeFile } = promises
+
 import ora from 'ora'
 
-export const cwd = process.cwd()
+import { isDebug, cwd } from './constants'
+
+export const logDebug = (...rest: string[]) => console.log(chalk.yellow(...rest))
 
 export const runCmd =  (options: {
   command: string,
@@ -12,8 +20,11 @@ export const runCmd =  (options: {
   // onExit?: (code: number | null) => void,
   // TODO: add the err handlers!!
 }) => new Promise((resolve, reject) => {
-  const spinner = ora(options.labelLoader).start()
+  if (isDebug) {
+    logDebug('\n> Debug: running command: ', options.command, options.params.join(' '))
+  }
 
+  const spinner = ora(options.labelLoader).start()
   const cp = spawn(options.command, options.params, {
     cwd: options.cwd || cwd,
     // stdio: 'inherit',
@@ -45,3 +56,24 @@ export const runCmd =  (options: {
     // console.error('error: ', code)
   })
 })
+
+export const readAndWriteTemplateFile = async (options: {
+  projectName: string,
+  template: string,
+  projectPathTowrite: string,
+}) => {
+  const pathToRead = path.join(__dirname, './templates', options.template)
+  const pathToWrite = path.join(cwd, options.projectName, options.projectPathTowrite, options.template)
+
+  if (isDebug) {
+    logDebug('\n> Debug: Reading template file from: ', pathToRead)
+  }
+  const customConfig = await readFile(pathToRead, { encoding: 'utf-8' })
+
+  if (isDebug) {
+    logDebug('\n> Debug: Writting template file to: ', pathToWrite)
+  }
+  await writeFile(pathToWrite, customConfig)
+
+  return true
+}
