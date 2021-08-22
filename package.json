@@ -4,11 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && node ./dist/create-next-app-nexus.js"
+    "build": "tsc && copyfiles -u 1 src/templates/**/* dist/ && node ./dist/create-next-app-nexus.js"
   },
   "dependencies": {
     "@types/inquirer": "^7.3.3",
     "@types/node": "16.6.2",
+    "copyfiles": "2.4.1",
     "inquirer": "^8.1.2",
     "ora": "5.4.1",
     "typescript": "^4.3.5"
