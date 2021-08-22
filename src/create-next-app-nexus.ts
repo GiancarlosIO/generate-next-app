@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 import path from 'path'
+import {  promises } from 'fs'
 
 import inquirer from 'inquirer'
 import ora from 'ora'
 
 import { runCmd, readAndWriteTemplateFile } from './utils'
 import { cwd } from './constants'
+
+const { readFile, writeFile } = promises
 
 const packages = [
   'graphql@15.5.1',
@@ -60,8 +63,8 @@ inquirer.prompt<{ projectName: string }>([
   // 1. Configure tailwindcss
   await runCmd({
     labelLoader: 'Initializing tailwindcss...',
-    command: 'npx',
-    params: ['tailwindcss', 'init', '-p'],
+    command: './node_modules/.bin/tailwindcss',
+    params: ['init', '-p'],
     cwd: projectPath,
   })
   let spinner = ora('Customizing tailwindcss configuration...').start()
@@ -80,7 +83,7 @@ inquirer.prompt<{ projectName: string }>([
   spinner = ora('Implementing NProgress package...').start()
   spinner.succeed()
 
-  spinner = ora('Configuring webpack alias and ts paths...').start()
+  spinner = ora('Configuring webpack aliases and ts paths...').start()
   await readAndWriteTemplateFile({
     projectName,
     template: 'next.config.js',
@@ -91,6 +94,11 @@ inquirer.prompt<{ projectName: string }>([
     template: 'tsconfig.paths.json',
     projectPathTowrite: './',
   })
+  const tsConfigContent = await readFile(path.join(cwd, projectName, './tsconfig.json'), { encoding: 'utf-8' })
+  const tsConfig = JSON.parse(tsConfigContent) as {[key: string]: string}
+  tsConfig.extends = './tsconfig.paths.json'
+  
+  await writeFile(path.join(cwd, projectName, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2))
   spinner.succeed()
 })
 
