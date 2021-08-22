@@ -1,12 +1,15 @@
 import { spawn } from 'child_process'
 import path from 'path'
 import {  promises } from 'fs'
+import chalk from 'chalk'
 
 const { readFile, writeFile } = promises
 
 import ora from 'ora'
 
 import { isDebug, cwd } from './constants'
+
+export const logDebug = (...rest: string[]) => console.log(chalk.yellow(...rest))
 
 export const runCmd =  (options: {
   command: string,
@@ -20,7 +23,7 @@ export const runCmd =  (options: {
   const spinner = ora(options.labelLoader).start()
 
   if (isDebug) {
-    console.log('\n> Debug: running command: ', options.command, options.params.join(' '))
+    logDebug('\n> Debug: running command: ', options.command, options.params.join(' '))
   }
   const cp = spawn(options.command, options.params, {
     cwd: options.cwd || cwd,
@@ -63,12 +66,12 @@ export const readAndWriteTemplateFile = async (options: {
   const pathToWrite = path.join(cwd, options.projectName, options.projectPathTowrite, options.template)
 
   if (isDebug) {
-    console.log('\n> Debug: Reading template file from: ', pathToRead)
+    logDebug('\n> Debug: Reading template file from: ', pathToRead)
   }
   const customConfig = await readFile(pathToRead, { encoding: 'utf-8' })
 
   if (isDebug) {
-    console.log('\n> Debug: Writting template file to: ', pathToWrite)
+    logDebug('\n> Debug: Writting template file to: ', pathToWrite)
   }
   await writeFile(pathToWrite, customConfig)
 
