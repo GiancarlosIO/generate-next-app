@@ -6,7 +6,7 @@ const { readFile, writeFile } = promises
 
 import ora from 'ora'
 
-export const cwd = process.cwd()
+import { isDebug, cwd } from './constants'
 
 export const runCmd =  (options: {
   command: string,
@@ -19,6 +19,9 @@ export const runCmd =  (options: {
 }) => new Promise((resolve, reject) => {
   const spinner = ora(options.labelLoader).start()
 
+  if (isDebug) {
+    console.log('\n> Debug: running command: ', options.command, options.params.join(' '))
+  }
   const cp = spawn(options.command, options.params, {
     cwd: options.cwd || cwd,
     // stdio: 'inherit',
@@ -51,8 +54,23 @@ export const runCmd =  (options: {
   })
 })
 
-export const readAndWriteTemplateFile = async (template: string, projectPathTowrite: string = '') => {
-  const customConfig = await readFile(path.join(__dirname, './templates', template), { encoding: 'utf-8' })
-  await writeFile(path.join(cwd, projectPathTowrite, template), customConfig)
+export const readAndWriteTemplateFile = async (options: {
+  projectName: string,
+  template: string,
+  projectPathTowrite: string,
+}) => {
+  const pathToRead = path.join(__dirname, './templates', options.template)
+  const pathToWrite = path.join(cwd, options.projectName, options.projectPathTowrite, options.template)
+
+  if (isDebug) {
+    console.log('\n> Debug: Reading template file from: ', pathToRead)
+  }
+  const customConfig = await readFile(pathToRead, { encoding: 'utf-8' })
+
+  if (isDebug) {
+    console.log('\n> Debug: Writting template file to: ', pathToWrite)
+  }
+  await writeFile(pathToWrite, customConfig)
+
   return true
 }

@@ -4,7 +4,8 @@ import path from 'path'
 import inquirer from 'inquirer'
 import ora from 'ora'
 
-import { runCmd, cwd, readAndWriteTemplateFile } from './utils'
+import { runCmd, readAndWriteTemplateFile } from './utils'
+import { cwd } from './constants'
 
 const packages = [
   'graphql@15.5.1',
@@ -22,6 +23,8 @@ const packages = [
   'identity-obj-proxy@3.0.0',
   'react-test-renderer@17.0.2',
   'cypress@8.3.0',
+  // webpack and typescript
+  'tsconfig-paths-webpack-plugin@3.5.1',
 ]
 
 inquirer.prompt<{ projectName: string }>([
@@ -62,7 +65,32 @@ inquirer.prompt<{ projectName: string }>([
     cwd: projectPath,
   })
   let spinner = ora('Customizing tailwindcss configuration...').start()
-  await readAndWriteTemplateFile('tailwind.config.js')
+  await readAndWriteTemplateFile({
+    projectName,
+    template: 'tailwind.config.js',
+    projectPathTowrite: './',
+  })
+  await readAndWriteTemplateFile({
+    projectName,
+    template: 'globals.css',
+    projectPathTowrite: './styles',
+  })
+  spinner.succeed()
+
+  spinner = ora('Implementing NProgress package...').start()
+  spinner.succeed()
+
+  spinner = ora('Configuring webpack alias and ts paths...').start()
+  await readAndWriteTemplateFile({
+    projectName,
+    template: 'next.config.js',
+    projectPathTowrite: './',
+  })
+  await readAndWriteTemplateFile({
+    projectName,
+    template: 'tsconfig.paths.json',
+    projectPathTowrite: './',
+  })
   spinner.succeed()
 })
 

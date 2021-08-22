@@ -9,5 +9,5 @@ This CLI creates a custom nextjs app with the following features:
 * Prettier formatter integrated with eslint
 * Jest integrated with @testing-library
 * Cypress Setup
-* Sentry integration
-* Github actions to run linters, typecheck and jest and cypress tests
+* Webpack alias and ts-paths
+* Webpack Bundle analyzer
