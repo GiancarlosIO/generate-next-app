@@ -9,6 +9,13 @@ const config = {
       }),
     ];
     config.plugins = [...config.plugins];
+
+    config.module.rules.push({
+      test: /\.(graphql|gql)$/,
+      include: [/src/],
+      loader: 'graphql-tag/loader',
+    });
+
     return config;
   },
 };
