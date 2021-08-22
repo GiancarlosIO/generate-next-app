@@ -9,7 +9,8 @@ import ora from 'ora'
 
 import { isDebug, cwd } from './constants'
 
-export const logDebug = (...rest: string[]) => console.log(chalk.yellow(...rest))
+export const logDebug = (...rest: string[]) =>
+  console.log(chalk.yellow('\n> Debug:',...rest))
 
 export const runCmd =  (options: {
   command: string,
@@ -21,7 +22,7 @@ export const runCmd =  (options: {
   // TODO: add the err handlers!!
 }) => new Promise((resolve, reject) => {
   if (isDebug) {
-    logDebug('\n> Debug: running command: ', options.command, options.params.join(' '))
+    logDebug('running command `', options.command, options.params.join(' '), '`')
   }
 
   const spinner = ora(options.labelLoader).start()
@@ -66,14 +67,15 @@ export const readAndWriteTemplateFile = async (options: {
   const pathToWrite = path.join(cwd, options.projectName, options.projectPathTowrite, options.template)
 
   if (isDebug) {
-    logDebug('\n> Debug: Reading template file from: ', pathToRead)
+    logDebug('Reading template file from ', pathToRead)
   }
   const customConfig = await readFile(pathToRead, { encoding: 'utf-8' })
 
   if (isDebug) {
-    logDebug('\n> Debug: Writting template file to: ', pathToWrite)
+    logDebug('Writting template file to ', pathToWrite)
   }
   await writeFile(pathToWrite, customConfig)
 
   return true
 }
+

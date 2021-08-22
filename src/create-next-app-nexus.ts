@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import path from 'path'
-import {  promises } from 'fs'
+import { promises } from 'fs'
 
+import fs from 'fs-extra'
 import inquirer from 'inquirer'
 import ora from 'ora'
 
@@ -9,7 +10,10 @@ import { runCmd, readAndWriteTemplateFile } from './utils'
 import { cwd } from './constants'
 import { EslintConfig } from './types'
 
-const { readFile, writeFile } = promises
+import customApp from './templates/_app'
+import homepage from './templates/index'
+
+const { readFile, writeFile, mkdir } = promises
 
 const packages = [
   'graphql@15.5.1',
@@ -35,6 +39,7 @@ const packages = [
   'eslint-plugin-prettier@3.4.1'
 ]
 
+
 inquirer.prompt<{ projectName: string }>([
   {
     type: 'input',
@@ -48,6 +53,8 @@ inquirer.prompt<{ projectName: string }>([
     }
   }
 ]).then(async ({ projectName }) => {
+  const getProjectPathOf = (folder: string) => path.join(cwd, projectName, folder)
+
   await runCmd({
     labelLoader: 'Creating the base nextjs app...',
     command: 'yarn',
@@ -99,14 +106,14 @@ inquirer.prompt<{ projectName: string }>([
     template: 'tsconfig.paths.json',
     projectPathTowrite: './',
   })
-  const tsConfigContent = await readFile(path.join(cwd, projectName, './tsconfig.json'), { encoding: 'utf-8' })
+  const tsConfigContent = await readFile(getProjectPathOf('./tsconfig.json'), { encoding: 'utf-8' })
   const tsConfig = JSON.parse(tsConfigContent) as {[key: string]: string}
   tsConfig.extends = './tsconfig.paths.json'
-  await writeFile(path.join(cwd, projectName, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2))
+  await writeFile(getProjectPathOf('tsconfig.json'), JSON.stringify(tsConfig, null, 2))
   spinner.succeed()
   
   spinner = ora('Configuring eslint and prettier...').start()
-  const eslintConfigContent = await readFile(path.join(cwd, projectName, '.eslintrc.json'), { encoding: 'utf-8' })
+  const eslintConfigContent = await readFile(getProjectPathOf('.eslintrc.json'), { encoding: 'utf-8' })
   const eslintConfig = JSON.parse(eslintConfigContent) as EslintConfig
   eslintConfig.extends = typeof eslintConfig.extends === 'string' ?
     [eslintConfig.extends, 'prettier'] :
@@ -126,7 +133,15 @@ inquirer.prompt<{ projectName: string }>([
       }
     ]
   }
-  await writeFile(path.join(cwd, projectName, '.eslintrc.json'), JSON.stringify(eslintConfig, null, 2))
+  await writeFile(getProjectPathOf('.eslintrc.json'), JSON.stringify(eslintConfig, null, 2))
+  spinner.succeed()
+
+  // customize project file structure
+  spinner = ora('Moving files and folders to improve project structure...').start()
+  await fs.move(getProjectPathOf('pages'), getProjectPathOf('src/pages'))
+  await mkdir(getProjectPathOf('src/shared'))
+  await mkdir(getProjectPathOf('src/views'))
+  await writeFile(getProjectPathOf('src/pages/_app.tsx'), customApp)
+  await writeFile(getProjectPathOf('src/pages/index.tsx'), homepage)
   spinner.succeed()
 })
-
