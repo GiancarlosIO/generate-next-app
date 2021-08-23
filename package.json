@@ -2,7 +2,7 @@
   "name": "generate-next-app",
   "author": "Giancarlos <giancarlos.isasi@gmail.com>",
   "homepage": "https://github.com/GiancarlosIO/generate-next-apps#readme",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "main": "index.js",
   "license": "MIT",
   "bin": {
@@ -27,7 +27,7 @@
     "inquirer": "^8.1.2",
     "minimist": "1.2.5",
     "ora": "5.4.1",
-    "typescript": "^4.3.5",
-    "tslib": "2.3.1"
+    "tslib": "2.3.1",
+    "typescript": "^4.3.5"
   }
 }
