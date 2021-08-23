@@ -1,4 +1,4 @@
-# create-next-app-nexus
+# generate-next-app
 _work in progress_
 
 Just a wrapper on top of create-next-app cli to create nextjs applications with my own custom packages and configurations.

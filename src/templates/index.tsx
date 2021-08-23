@@ -28,12 +28,12 @@ const Home: NextPage = () => {
         </ul>
         <p className="text-xl">Read the full documentation in:</p>
         <a
-          href="https://github.com/GiancarlosIO/create-next-app-nexus"
+          href="https://github.com/GiancarlosIO/generate-next-app"
           className="text-xl text-blue-500 hover:underline"
           target="_blank"
           rel="noreferrer"
         >
-          https://github.com/GiancarlosIO/create-next-app-nexus
+          https://github.com/GiancarlosIO/generate-next-app
         </a>
       </div>
     </div>
