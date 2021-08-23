@@ -17,3 +17,19 @@ This CLI creates a custom nextjs app with the following features:
 
 ## Requeriments
 * node version > 12.20
+
+## Usage
+### Install
+npm:
+> npm install -g generate-next-app
+
+yarn
+> yarn global add generate-next-app
+
+### Create a next app
+> generate-next-app
+
+Give it the project name and it will generate and configurate your nextjs application automatically
+
+You can use the additional argvs to customize the tech stack.
+* --debug: Log detailts about each command and step that is running.
