@@ -3,7 +3,7 @@ _work in progress_
 
 Just a wrapper on top of create-next-app cli to create nextjs applications with my own custom packages and configurations.
 This CLI creates a custom nextjs app with the following features:
-* Graphql support integration with react-query
+* Graphql support integrated with react-query and Graphql Codegen
 * TailwindCSS with a custom configuration and optimization.
 * Nprogress integrated to improve ux in page transitions
 * Prettier formatter integrated with eslint
@@ -11,3 +11,6 @@ This CLI creates a custom nextjs app with the following features:
 * Cypress Setup
 * Webpack alias and ts-paths
 * Webpack Bundle analyzer
+
+## Requeriments
+* node version > 12.20

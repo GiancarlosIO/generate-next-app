@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && copyfiles -u 1 src/templates/**/* dist/ && node ./dist/create-next-app-nexus.js --debug"
+    "build": "tsc && copyfiles -u 1 src/templates/**/*.env dist/ && node ./dist/create-next-app-nexus.js --debug"
   },
   "dependencies": {
     "@types/fs-extra": "9.0.12",

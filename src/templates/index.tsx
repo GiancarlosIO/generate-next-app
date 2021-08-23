@@ -17,7 +17,7 @@ const Home: NextPage = () => {
           This Custom Nextjs App has the follows features:
         </p>
         <ul className="text-xl list-disc list-inside mb-4">
-          <li>Graphql support integration with react-query</li>
+          <li>Graphql support integrated with react-query and Graphql Codegen</li>
           <li>TailwindCSS with a custom configuration and optimization.</li>
           <li>Nprogress integrated to improve ux in page transitions</li>
           <li>Prettier formatter integrated with eslint</li>

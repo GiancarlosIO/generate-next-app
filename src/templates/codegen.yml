@@ -1,0 +1,18 @@
+schema: ${GRAPHQL_ENDPOINT}
+documents: './src/**/*.graphql'
+generates:
+  src/generated/types.ts:
+    - typescript
+  ./src:
+    preset: near-operation-file
+    presetConfig:
+      baseTypesPath: ./generated/types.ts
+    plugins:
+      - typescript-operations
+      - typescript-react-query
+    config:
+      fetcher:
+        func: '@/api/fetcher#fetchData'
+hooks:
+  afterAllFileWrite:
+    - eslint --fix
