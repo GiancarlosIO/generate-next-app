@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && copyfiles -u 1 src/templates/**/*.env dist/",
+    "build": "tsc && copyfiles -u 1 src/templates/**/* dist/",
     "test": "npm run build && node ./dist/generate-next-app.js",
     "prepare": "npm run build"
   },
