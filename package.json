@@ -2,7 +2,7 @@
   "name": "generate-next-app",
   "author": "Giancarlos <giancarlos.isasi@gmail.com>",
   "homepage": "https://github.com/GiancarlosIO/generate-next-apps#readme",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "index.js",
   "license": "MIT",
   "bin": {
@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc && copyfiles -u 1 src/templates/**/*.env dist/",
     "test": "npm run build && node ./dist/generate-next-app.js",
-    "prepublishOnly": "npm run build"
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@types/fs-extra": "9.0.12",
