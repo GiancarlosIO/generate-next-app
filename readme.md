@@ -12,5 +12,8 @@ This CLI creates a custom nextjs app with the following features:
 * Webpack alias and ts-paths
 * Webpack Bundle analyzer
 
+![CLI](img/cli.png)
+
+
 ## Requeriments
 * node version > 12.20
