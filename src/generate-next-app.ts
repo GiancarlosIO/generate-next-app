@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import path from 'path'
-import {  promises } from 'fs'
+import { promises } from 'fs'
 
+import chalk from 'chalk'
+import fs from 'fs-extra'
 import inquirer from 'inquirer'
 import ora from 'ora'
 
@@ -9,12 +11,28 @@ import { runCmd, readAndWriteTemplateFile } from './utils'
 import { cwd } from './constants'
 import { EslintConfig } from './types'
 
-const { readFile, writeFile } = promises
+import customApp from './templates/_app'
+import homepage from './templates/index'
+import envs from './templates/envs'
+
+const { readFile, writeFile, mkdir } = promises
+
+const nodeVersion = parseFloat(process.version.replace('v', ''))
+if (nodeVersion < 12.20) {
+  console.log(chalk.red('😥 Error: Node version should be equal o greater than 12.20. Please upgrade your nodejs version  🙏'))
+  console.log(chalk.yellow('We need v12.20 or greater because we use some packages (like @graphq-codegen) that require it. 😅'))
+  process.exit(1)
+}
 
 const packages = [
   'graphql@15.5.1',
   'graphql-tag@2.12.5',
   'react-query@3.19.6',
+  '@graphql-codegen/cli@2.1.1',
+  '@graphql-codegen/typescript@2.1.0',
+  '@graphql-codegen/near-operation-file-preset@2.1.0',
+  '@graphql-codegen/typescript-operations@2.1.0',
+  '@graphql-codegen/typescript-react-query@2.1.0',
   // tailwindcss
   'tailwindcss@2.2.7',
   'postcss@8.3.6',
@@ -48,6 +66,8 @@ inquirer.prompt<{ projectName: string }>([
     }
   }
 ]).then(async ({ projectName }) => {
+  const getProjectPathOf = (folder: string) => path.join(cwd, projectName, folder)
+
   await runCmd({
     labelLoader: 'Creating the base nextjs app...',
     command: 'yarn',
@@ -99,14 +119,14 @@ inquirer.prompt<{ projectName: string }>([
     template: 'tsconfig.paths.json',
     projectPathTowrite: './',
   })
-  const tsConfigContent = await readFile(path.join(cwd, projectName, './tsconfig.json'), { encoding: 'utf-8' })
+  const tsConfigContent = await readFile(getProjectPathOf('./tsconfig.json'), { encoding: 'utf-8' })
   const tsConfig = JSON.parse(tsConfigContent) as {[key: string]: string}
   tsConfig.extends = './tsconfig.paths.json'
-  await writeFile(path.join(cwd, projectName, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2))
+  await writeFile(getProjectPathOf('tsconfig.json'), JSON.stringify(tsConfig, null, 2))
   spinner.succeed()
   
   spinner = ora('Configuring eslint and prettier...').start()
-  const eslintConfigContent = await readFile(path.join(cwd, projectName, '.eslintrc.json'), { encoding: 'utf-8' })
+  const eslintConfigContent = await readFile(getProjectPathOf('.eslintrc.json'), { encoding: 'utf-8' })
   const eslintConfig = JSON.parse(eslintConfigContent) as EslintConfig
   eslintConfig.extends = typeof eslintConfig.extends === 'string' ?
     [eslintConfig.extends, 'prettier'] :
@@ -126,7 +146,30 @@ inquirer.prompt<{ projectName: string }>([
       }
     ]
   }
-  await writeFile(path.join(cwd, projectName, '.eslintrc.json'), JSON.stringify(eslintConfig, null, 2))
+  await writeFile(getProjectPathOf('.eslintrc.json'), JSON.stringify(eslintConfig, null, 2))
+  spinner.succeed()
+
+  // customize project file structure
+  spinner = ora('Moving files and folders to improve project structure...').start()
+  await fs.move(getProjectPathOf('pages'), getProjectPathOf('src/pages'))
+  await mkdir(getProjectPathOf('src/shared'))
+  await mkdir(getProjectPathOf('src/views'))
+  await mkdir(getProjectPathOf('src/api'))
+  await writeFile(getProjectPathOf('src/pages/_app.tsx'), customApp)
+  await writeFile(getProjectPathOf('src/pages/index.tsx'), homepage)
+  spinner.succeed()
+
+  // script "generate": "graphql-codegen"     "generate": "graphql-codegen -r dotenv/config"
+  spinner = ora('Configuring graphql-tag, react query and graphql codegen...').start()
+  const packageJsonContent = await readFile(getProjectPathOf('./package.json'), { encoding: 'utf-8' })
+  const packageJson = JSON.parse(packageJsonContent) as {scripts: {[key: string]: string}}
+  packageJson.scripts = {
+    ...packageJson.scripts,
+    generate: 'graphql-codegen -r dotenv/config',
+  }
+  await writeFile(getProjectPathOf('package.json'), JSON.stringify(packageJson, null, 2))
+  await writeFile(getProjectPathOf('.env'), envs)
+  await fs.copy(path.join(__dirname, './templates/codegen.yml'), getProjectPathOf('./codegen.yml'))
+  await fs.copy(path.join(__dirname, './templates/fetcher.ts'), getProjectPathOf('src/api/fetcher.ts'))
   spinner.succeed()
 })
-
