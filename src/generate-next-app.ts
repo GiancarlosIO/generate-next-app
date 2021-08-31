@@ -88,8 +88,8 @@ inquirer.prompt<{ projectName: string }>([
   // 1. Configure tailwindcss
   await runCmd({
     labelLoader: 'Initializing tailwindcss...',
-    command: './node_modules/.bin/tailwindcss',
-    params: ['init', '-p'],
+    command: 'npx',
+    params: ['tailwindcss', 'init', '-p'],
     cwd: projectPath,
   })
   let spinner = ora('Customizing tailwindcss configuration...').start()
@@ -124,7 +124,7 @@ inquirer.prompt<{ projectName: string }>([
   tsConfig.extends = './tsconfig.paths.json'
   await writeFile(getProjectPathOf('tsconfig.json'), JSON.stringify(tsConfig, null, 2))
   spinner.succeed()
-  
+
   spinner = ora('Configuring eslint and prettier...').start()
   const eslintConfigContent = await readFile(getProjectPathOf('.eslintrc.json'), { encoding: 'utf-8' })
   const eslintConfig = JSON.parse(eslintConfigContent) as EslintConfig
