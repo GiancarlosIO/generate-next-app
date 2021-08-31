@@ -28,6 +28,8 @@ export const runCmd =  (options: {
   const spinner = ora(options.labelLoader).start()
   const cp = spawn(options.command, options.params, {
     cwd: options.cwd || cwd,
+    // if we use ./node_modules in the command we dont need to use shell true
+    shell: process.platform  === 'win32',
     // stdio: 'inherit',
   })
 
