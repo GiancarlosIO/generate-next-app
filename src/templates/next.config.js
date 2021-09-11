@@ -1,6 +1,10 @@
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const config = {
+  env: {
+    REST_ENDPOINT: process.env.REST_ENDPOINT,
+    GRAPHQL_ENDPOINT: process.env.REST_ENDPOINT,
+  },
   webpack: config => {
     config.resolve.plugins = [
       ...config.resolve.plugins,
