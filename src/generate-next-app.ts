@@ -44,6 +44,8 @@ const packages = [
   '@testing-library/jest-dom@5.14.1',
   'identity-obj-proxy@3.0.0',
   'react-test-renderer@17.0.2',
+  'node-fetch',
+  'dotenv',
   'cypress@8.3.0',
   // webpack and typescript
   'tsconfig-paths-webpack-plugin@3.5.1',
@@ -171,5 +173,12 @@ inquirer.prompt<{ projectName: string }>([
   await writeFile(getProjectPathOf('.env'), envs)
   await fs.copy(path.join(__dirname, './templates/codegen.yml'), getProjectPathOf('./codegen.yml'))
   await fs.copy(path.join(__dirname, './templates/fetcher.ts'), getProjectPathOf('src/api/fetcher.ts'))
+  spinner.succeed()
+
+  spinner = ora('Configuring jest and cypress...').start()
+  await fs.copy(path.join(__dirname, './templates/test-utils'), getProjectPathOf('src/test-utils'))
+  await fs.copy(path.join(__dirname, './templates/__mocks__'), getProjectPathOf('src/__mocks__'))
+  await fs.copy(path.join(__dirname, './templates/jest.config.js'), getProjectPathOf('./jest.config.js'))
+  await fs.copy(path.join(__dirname, './templates/jest.setup.js'), getProjectPathOf('./jest.setup.js'))
   spinner.succeed()
 })

@@ -1,6 +1,12 @@
 {
   // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
   "include": ["src", "types"],
+  "exclude": [
+    "src/templates/__mocks__",
+    "src/templates/test-utils",
+    "src/templates/jest.config.js",
+    "src/templates/jest.setup.js",
+  ],
   "compilerOptions": {
     "module": "CommonJS",
     "lib": ["dom", "esnext"],
