@@ -1,5 +1,5 @@
 # generate-next-app [![npm](https://img.shields.io/npm/v/generate-next-app)](https://www.npmjs.com/package/generate-next-app)
-_work in progress_
+_work in progress (80%)_
 
 Just a wrapper on top of create-next-app cli to create nextjs applications with my own custom packages and configurations.
 This CLI creates a custom nextjs app with the following features:
