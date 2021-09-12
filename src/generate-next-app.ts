@@ -44,8 +44,8 @@ const packages = [
   '@testing-library/jest-dom@5.14.1',
   'identity-obj-proxy@3.0.0',
   'react-test-renderer@17.0.2',
-  'node-fetch',
-  'dotenv',
+  'node-fetch@2.6.2',
+  'dotenv@10.0.0',
   'cypress@8.3.0',
   // webpack and typescript
   'tsconfig-paths-webpack-plugin@3.5.1',
