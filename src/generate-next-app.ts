@@ -163,8 +163,8 @@ inquirer.prompt<{ projectName: string }>([
 
   // script "generate": "graphql-codegen"     "generate": "graphql-codegen -r dotenv/config"
   spinner = ora('Configuring graphql-tag, react query and graphql codegen...').start()
-  const packageJsonContent = await readFile(getProjectPathOf('./package.json'), { encoding: 'utf-8' })
-  const packageJson = JSON.parse(packageJsonContent) as {scripts: {[key: string]: string}}
+  let packageJsonContent = await readFile(getProjectPathOf('./package.json'), { encoding: 'utf-8' })
+  let packageJson = JSON.parse(packageJsonContent) as {scripts: {[key: string]: string}}
   packageJson.scripts = {
     ...packageJson.scripts,
     generate: 'graphql-codegen -r dotenv/config',
@@ -180,5 +180,13 @@ inquirer.prompt<{ projectName: string }>([
   await fs.copy(path.join(__dirname, './templates/__mocks__'), getProjectPathOf('src/__mocks__'))
   await fs.copy(path.join(__dirname, './templates/jest.config.js'), getProjectPathOf('./jest.config.js'))
   await fs.copy(path.join(__dirname, './templates/jest.setup.js'), getProjectPathOf('./jest.setup.js'))
+  packageJsonContent = await readFile(getProjectPathOf('./package.json'), { encoding: 'utf-8' })
+  packageJson = JSON.parse(packageJsonContent) as {scripts: {[key: string]: string}}
+  packageJson.scripts = {
+    ...packageJson.scripts,
+    test: 'jest',
+    'test:watch': 'jest --watch',
+  }
+  await writeFile(getProjectPathOf('package.json'), JSON.stringify(packageJson, null, 2))
   spinner.succeed()
 })
