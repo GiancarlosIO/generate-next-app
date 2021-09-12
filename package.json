@@ -2,7 +2,7 @@
   "name": "generate-next-app",
   "author": "Giancarlos <giancarlos.isasi@gmail.com>",
   "homepage": "https://github.com/GiancarlosIO/generate-next-apps#readme",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "main": "index.js",
   "license": "MIT",
   "bin": {
